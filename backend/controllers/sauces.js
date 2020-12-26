@@ -2,7 +2,7 @@
 const Sauce = require('../models/sauces')
 
 const fs= require('fs'); // file system: gestionnaire de fichiers 
-
+/*------------- Creation sauce +enregistrement BDD ----------*/
 exports.createSauces= (req, res, next) =>{ 
     const sauceObject = JSON.parse(req.body.sauce) //Le format de la req a été obligatoirement changé (multer) pour pvr envoyer un fichier avec la req.
     delete sauceObject._id
@@ -19,6 +19,7 @@ exports.createSauces= (req, res, next) =>{
       .then(() => res.status(201).json({ message: 'Sauce enregistrée !'}))
       .catch(error => res.status(400).json({ error }));
   };
+  /*------------------ Update sauce -------------*/
   exports.modifySauce= (req, res, next) => {
     const sauceObject = req.file ?
     {
@@ -29,7 +30,7 @@ exports.createSauces= (req, res, next) =>{
       .then(() => res.status(200).json({ message: 'Sauce modifiée !'}))
       .catch(error => res.status(400).json({ error }));
   };
-
+/*-------------------- Delete sauce --------------*/
   exports.deleteSauce= (req, res, next) => {
     Sauce.findOne({ _id: req.params.id }) // Trouver l'objet à supprimer, que l'id de celui ci corresponde à l'if de celui de la requête
     .then(sauce =>{
@@ -43,102 +44,61 @@ exports.createSauces= (req, res, next) =>{
     .catch(error => res.status(500).json({error}))
    
 };
+/*-------------- Recupération d'un sauce -----------*/
 exports.getOneSauce= (req, res, next) => {
     Sauce.findOne({ _id: req.params.id })
       .then(sauce => res.status(200).json(sauce))
       .catch(error => res.status(404).json({ error }));
   };
-
+/*---------------- Récupérations de toutes les sauces ------------*/
   exports.getAllSauce= (req, res, next) => {
     Sauce.find()
     .then(sauces => res.status(200).json(sauces))
     .catch(error => res.status(400).json({ error }));
   }
-
+/*-------------- Likes & Dislikes ------------*/
   exports.likeSauce = (req, res, next) => {
     Sauce.findOne({ _id: req.params.id })
-    /*.then(sauces => res.status(200).json(sauces))
-    .catch(error => res.status(400).json({ error }));
-  }*/
     .then(sauce => {
 
-          if (req.body.like == 1 ) {
-              
-              res.status(200).json({ message: 'Vous aimez cette sauce'})
+          if (req.body.like == 1 && sauce.usersLiked.indexOf(req.body.userId)<0){
+            res.status(200).json({ message: 'Vous aimez cette sauce'})
               sauce.usersLiked.push(req.body.userId);
               sauce.likes +=1
-              console.log('Aime')
+              sauce.save()
+              .then(() => res.status(201).json({ message: 'Sauce aimée'}))
+              .catch(error => res.status(400).json({ error }));
+              console.log('Aime');
           }
-          else if (req.body.like == -1 ) {
-              
+          else if (req.body.like == -1 && sauce.usersDisliked.indexOf(req.body.userId)<0) {
             res.status(200).json({ message: 'Vous détestez cette sauce'})
-            sauce.usersLiked.push(req.body.userId)
+            sauce.usersDisliked.push(req.body.userId)
             sauce.dislikes +=1
-            console.log('Déteste')
+            sauce.save()
+              .then(() => res.status(201).json({ message: 'Sauce détestée !'}))
+              .catch(error => res.status(400).json({ error }));
+            console.log('Déteste');
           }
        else { 
+         sauce.usersLiked.forEach(element => {
+           if(element == req.body.userId){
+             sauce.likes-=1
+             sauce.usersLiked.splice(sauce.usersLiked.indexOf(req.body.userId),1);
+           }
+         });
+         sauce.usersDisliked.forEach(element => {
+          if(element == req.body.userId){
+            sauce.dislikes-=1
+            sauce.usersDisliked.splice(sauce.usersDisliked.indexOf(req.body.userId),1);
+          }
+        });
         res.status(200).json({ message: 'Pas de préférence'})
-        console.log('Neutre')
+        sauce.save()
+              .then(() => res.status(201).json({ message: 'Sauce détestée !'}))
+              .catch(error => res.status(400).json({error}));
+        console.log('Neutre');
        }
       })
 
-        .catch(error => res.status(404).json({ error }));
+        .catch(error => res.status(404).json({ message:"Vous ne pouvez pas saisir votre choix" }));
           }
-    /*
-      req.body.sauce= sauce,
-      req.body.message= message,
-      next();
-      
-      .catch (error => res.status(400).json({ error }));
-      
-      }
-
-          
-         
-    /* .then(userId => 
-            
-            
-
-    .catch(error => res.status(400).json({ error }));
-            } */
-    
-
-
-
-    /* Sauce.findOne({ _id: req.params.id }) 
-      .then(() => res.status(200).json({ message: 'Choix enregistré'})  
-      .catch(error => res.status(400).json({ error })));  
-  }
-    
-    /*if (like=1)
-    {"J'aime"}
-    else if (like=-1)
-    {"N'aime pas"}
-    else {"Sans avis"};
-  }
-
-  switch (like) {
-  case '1':
-    console.log("L'utilisateur aime cette sauce");
-    break;
-  case '0':
-    console.log("Neutre");
-    break;
-  case '-1':
-    console.log("L'utilisateur n'aime pas cette sauce");
-    break;
-    }
-}
-      .then(sauce => res.status(200).json(sauce))
-      .catch(error => res.status(404).json({ error }));
- } 
-
- sauce.usersLiked.array.forEach(element => {
-  if (element==req.body.userId){
-    sauce.like -= 1;
-    sauce.usersLiked.splice(sauce.usersLiked.indexOf(req.body.userId),1);
-  }
-  if (element==req.body.userId){
-    sauce.disLike -= 1;
-    sauce.usersdisLiked.splice(sauce.usersdisLiked.indexOf(req.body.userId),1);
-  } */
