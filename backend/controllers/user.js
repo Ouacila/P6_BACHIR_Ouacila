@@ -1,9 +1,18 @@
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const User = require("../models/user");
+const {
+  validationResult
+} = require("express-validator");
 
 /* ---------- Creation user -----------------*/
 exports.signup = (req, res, next) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({
+      errors: errors.array()
+    })
+  }
   bcrypt
     .hash(
       req.body.password,
@@ -37,9 +46,16 @@ exports.signup = (req, res, next) => {
 
 /*-------------------- Connexion user -------------*/
 exports.login = (req, res, next) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({
+      errors: errors.array(),
+    });
+  }
+
   User.findOne({
-    email: req.body.email,
-  })
+      email: req.body.email,
+    })
     .then((user) => {
       if (!user) {
         return res.status(401).json({
@@ -56,12 +72,10 @@ exports.login = (req, res, next) => {
           }
           res.status(200).json({
             userId: user._id,
-            token: jwt.sign(
-              {
+            token: jwt.sign({
                 userId: user._id,
               },
-              "2700549958242410746f88bdb4c763cfa60045fd",
-              {
+              "2700549958242410746f88bdb4c763cfa60045fd", {
                 expiresIn: "24h",
               }
             ),

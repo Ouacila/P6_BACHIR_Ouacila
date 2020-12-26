@@ -4,7 +4,6 @@ const helmet = require("helmet");
 var session = require("cookie-session");
 
 const mongoose = require("mongoose");
-const mongoMask = require("mongo-mask");
 const bodyParser = require("body-parser");
 
 const path = require("path");
@@ -14,9 +13,10 @@ const saucesRoutes = require("./routes/sauces");
 
 mongoose
   .connect(
-    "mongodb+srv://Ouacila:Shuichi1@cluster0.e9qif.mongodb.net/<dbname>?retryWrites=true&w=majority", {
+    "mongodb+srv://Ouacila:Shuichi1@cluster0.e9qif.mongodb.net/<dbname>?retryWrites=true&w=majority",
+    {
       useNewUrlParser: true,
-      useUnifiedTopology: true
+      useUnifiedTopology: true,
     }
   )
   .then(() => console.log("Connexion à MongoDB réussie !"))
@@ -47,7 +47,7 @@ app.use(
     cookie: {
       secure: true,
       httpOnly: true,
-      expires: 24
+      expires: 24,
     },
   })
 );
