@@ -39,11 +39,14 @@ d'accéder à notre API depuis n'importe quelle origine ( '*' ) ;
 d'ajouter les headers mentionnés aux requêtes envoyées vers notre API (Origin , X-Requested-With , etc.) ;
 d'envoyer des requêtes avec les méthodes mentionnées ( GET ,POST , etc.).*/
 
+// Empêche l'ouverture de la page dans le cadre ou l'iframe pour protéger du détournement de clic
+app.disable("x-powered-by");
+
 var expiryDate = new Date(Date.now() + 60 * 60 * 1000); // 1 heure
 app.use(
   session({
     name: "session",
-    keys: ["key1", "key2"],
+    keys: ["userId"],
     cookie: {
       secure: true,
       httpOnly: true,

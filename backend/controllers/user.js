@@ -1,9 +1,11 @@
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
-const User = require("../models/user");
 const {
   validationResult
 } = require("express-validator");
+
+const User = require("../models/user");
+
 
 /* ---------- Creation user -----------------*/
 exports.signup = (req, res, next) => {
@@ -11,7 +13,7 @@ exports.signup = (req, res, next) => {
   if (!errors.isEmpty()) {
     return res.status(400).json({
       errors: errors.array()
-    })
+    });
   }
   bcrypt
     .hash(

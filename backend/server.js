@@ -45,4 +45,10 @@ server.on("listening", () => {
   console.log("Listening on " + bind);
 });
 
+/*const swig = require("swig-templates");
+swig.init({
+  root: __dirname + "/ app / views",
+  autoescape: true, // valeur par défaut
+});*/
+
 server.listen(port);
