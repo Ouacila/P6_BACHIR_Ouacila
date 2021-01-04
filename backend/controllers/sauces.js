@@ -94,7 +94,7 @@ exports.likeSauce = (req, res, next) => {
     })
     .then(sauce => {
 
-      if (req.body.like == 1 && sauce.usersLiked.indexOf(req.body.userId) < 0) {
+      if (req.body.like == 1 && sauce.usersLiked == 0) {
         res.status(200).json({
           message: 'Vous aimez cette sauce'
         })
@@ -108,7 +108,7 @@ exports.likeSauce = (req, res, next) => {
             error
           }));
         console.log('Aime');
-      } else if (req.body.like == -1 && sauce.usersDisliked.indexOf(req.body.userId) < 0) {
+      } else if (req.body.like == -1 && sauce.usersDisliked == 0) {
         res.status(200).json({
           message: 'Vous détestez cette sauce'
         })
